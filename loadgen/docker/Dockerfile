@@ -17,9 +17,36 @@ ENV LOADGEN_BRANCH "master"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-        
+        cmake \
+        git \
+        python3-distutils \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN curl -fSsL -O https://bootstrap.pypa.io/get-pip.py && \
+    python3 get-pip.py && \
+    rm get-pip.py
+
+# Install python 3.7.
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y \
+    python3.7 python3.7-dev python3-pip python3.7-venv && \
+    rm -rf /var/lib/apt/lists/* && \
+    python3.7 -m pip install pip --upgrade && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 0
+
+# Make python3.7 the default python version
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 0
+
+# Make python3.6 the default python version
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.6 0
+
+WORKDIR /mlperf_inference
+RUN git clone -b ${LOADGEN_BRANCH} https://github.com/mlperf/inference.git && mv inference/* . && rm -rf inference
+
+# Build LoadGen
+RUN mkdir loadgen/build/ && cd loadgen/build && cmake .. && cmake --build . && cp libmlperf_loadgen.a /usr/local/bin
+
+CMD ["/bin/bash"]
 
