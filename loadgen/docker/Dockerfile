@@ -50,8 +50,9 @@ WORKDIR /mlperf_inference
 RUN git clone -b ${LOADGEN_BRANCH} https://github.com/mlperf/inference.git && mv inference/* . && rm -rf inference
 
 # Build and install LoadGen Python bindings.
-RUN cd loadgen && CFLAGS="-std=c++14 -03" python setup.py bdist_wheel && pip install --force-reinstall dist/mlperf_loadgen-0.5a0-cp36-cp36m-linux_x86_64.whl
+RUN cd loadgen && CFLAGS="-std=c++14 -O3" python setup.py bdist_wheel && pip install --force-reinstall dist/mlperf_loadgen-0.5a0-cp36-cp36m-linux_x86_64.whl
 #RUN mkdir loadgen/build/ && cd loadgen/build && cmake .. && cmake --build . && cp libmlperf_loadgen.a /usr/local/bin
+
 
 CMD ["/bin/bash"]
 
