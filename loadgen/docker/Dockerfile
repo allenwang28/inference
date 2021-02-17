@@ -18,8 +18,10 @@ ENV LOADGEN_BRANCH "master"
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         cmake \
+        curl \
         git \
         python3-distutils \
+        software-properties-common \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -39,8 +41,9 @@ RUN add-apt-repository ppa:deadsnakes/ppa && \
 # Make python3.7 the default python version
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 0
 
-# Make python3.6 the default python version
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.6 0
+RUN pip3 --no-cache-dir install \
+    absl-py \
+    numpy
 
 WORKDIR /mlperf_inference
 RUN git clone -b ${LOADGEN_BRANCH} https://github.com/mlperf/inference.git && mv inference/* . && rm -rf inference
